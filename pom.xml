@@ -25,11 +25,13 @@
         <kubernetes.version>10.0.0</kubernetes.version>
 
         <auth.version>1.1.1-alpha-SNAPSHOT</auth.version>
+        <storage.version>0.0.6-SNAPSHOT</storage.version>
     </properties>
 
     <modules>
         <module>fun-core</module>
         <module>fun-kubeless</module>
+        <module>fun-store</module>
         <module>fun-service</module>
     </modules>
 
@@ -65,6 +67,11 @@
             </dependency>
             <dependency>
                 <groupId>plus.fun</groupId>
+                <artifactId>fun-store</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>plus.fun</groupId>
                 <artifactId>fun-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -79,6 +86,14 @@
                 <groupId>plus.auth</groupId>
                 <artifactId>auth-common</artifactId>
                 <version>${auth.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.dustlight.storage</groupId>
+                <artifactId>storage</artifactId>
+                <version>${storage.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

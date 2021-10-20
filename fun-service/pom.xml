@@ -65,6 +65,10 @@
             <groupId>plus.fun</groupId>
             <artifactId>fun-kubeless</artifactId>
         </dependency>
+        <dependency>
+            <groupId>plus.fun</groupId>
+            <artifactId>fun-store</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>plus.auth</groupId>
@@ -73,6 +77,17 @@
         <dependency>
             <groupId>plus.auth</groupId>
             <artifactId>auth-client-reactive</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.dustlight.storage</groupId>
+            <artifactId>minio-storage</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.0</version>
         </dependency>
     </dependencies>
 

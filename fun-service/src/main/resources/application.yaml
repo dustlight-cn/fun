@@ -14,6 +14,14 @@ plus:
       token-type: jwt
   fun:
     authorization-endpoint: "http://accounts.wgv.ink/authorize"
+dustlight:
+  storage:
+    minio:
+      endpoint: http://oss.wgv
+      bucket: functions
+      secret-access-key: l1ezn4IgqG61ClxSmrwQOXMHVHqCya5YiJk3hDL1
+      access-key-id: 92GYTM1U7M76OQO740BW
+      region: gz-wgv
 # SpringDoc 配置
 springdoc:
   api-docs:
