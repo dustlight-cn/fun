@@ -18,7 +18,6 @@ public class FunctionStorage implements FunctionStore {
 
     private RestfulStorage storage;
     private String prefix = "";
-    private long storeExpiration = 1000 * 60 * 60 * 24 * 365 * 5;
     private long getExpiration = 1000 * 60 * 15;
 
     @Override

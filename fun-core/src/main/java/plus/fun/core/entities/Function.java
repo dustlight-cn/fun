@@ -10,6 +10,10 @@ public interface Function {
 
     String getName();
 
+    String getRuntime();
+
+    String getHandler();
+
     Instant getCreatedAt();
 
     Instant getUpdatedAt();
