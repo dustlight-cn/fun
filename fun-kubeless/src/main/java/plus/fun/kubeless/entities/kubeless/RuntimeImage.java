@@ -1,6 +1,7 @@
-package plus.fun.kubeless.entities;
+package plus.fun.kubeless.entities.kubeless;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 public class RuntimeImage implements Serializable {
 
     @JsonAlias("ID")
+    @SerializedName("ID")
     private String id;
 
     private String depName;

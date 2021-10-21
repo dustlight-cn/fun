@@ -6,9 +6,6 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.*;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
-import io.kubernetes.client.openapi.models.V1ConfigMapList;
-import io.kubernetes.client.openapi.models.V1NamespaceList;
-import io.kubernetes.client.proto.V1;
 import io.kubernetes.client.util.ClientBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,20 +31,9 @@ public class KubernetesClientTest {
     @Test
     public void test() throws ApiException, InterruptedException {
         CoreV1Api coreV1Api = new CoreV1Api();
-        V1ConfigMap cfg = coreV1Api.readNamespacedConfigMap("kubeless-config", "kubeless", "", false, false);
-        System.out.println(cfg);
 
-        coreV1Api.listNamespacedConfigMapAsync("kubeless",
-                "kubeless-config",
-                false,
-                "",
-                "",
-                "",
-                null,
-                "",
-                null,
-                false,
-                new ApiCallback<V1ConfigMapList>() {
+        coreV1Api.readNamespacedConfigMapAsync("kubeless-config", "kubeless", "", false, false
+                , new ApiCallback<V1ConfigMap>() {
                     @Override
                     public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
                         e.printStackTrace();
@@ -57,7 +43,8 @@ public class KubernetesClientTest {
                     }
 
                     @Override
-                    public void onSuccess(V1ConfigMapList result, int statusCode, Map<String, List<String>> responseHeaders) {
+                    public void onSuccess(V1ConfigMap result, int statusCode, Map<String, List<String>> responseHeaders) {
+
                         System.out.println(result);
                         synchronized (coreV1Api) {
                             coreV1Api.notifyAll();
@@ -74,6 +61,7 @@ public class KubernetesClientTest {
 
                     }
                 });
+
         synchronized (coreV1Api) {
             coreV1Api.wait();
         }

@@ -1,4 +1,4 @@
-package plus.fun.kubeless.entities;
+package plus.fun.kubeless.entities.kubeless;
 
 import java.util.LinkedList;
 

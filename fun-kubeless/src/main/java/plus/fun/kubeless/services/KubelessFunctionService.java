@@ -1,61 +1,258 @@
 package plus.fun.kubeless.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.openapi.ApiCallback;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1ConfigMap;
-import io.kubernetes.client.util.ClientBuilder;
-import io.kubernetes.client.util.Config;
+import io.kubernetes.client.openapi.apis.CustomObjectsApi;
+import io.kubernetes.client.openapi.models.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import okhttp3.Call;
 import plus.fun.core.service.FunctionService;
 import plus.fun.kubeless.entities.KubelessFunction;
-import plus.fun.kubeless.entities.RuntimeImage;
-import plus.fun.kubeless.entities.RuntimeImages;
+import plus.fun.kubeless.entities.kubeless.FunctionEntity;
+import plus.fun.kubeless.entities.kubeless.FunectionListEntity;
+import plus.fun.kubeless.entities.kubeless.RuntimeImage;
+import plus.fun.kubeless.entities.kubeless.RuntimeImages;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-public class KubelessFunctionService implements FunctionService<KubelessFunction>, InitializingBean, ApplicationContextAware {
+public class KubelessFunctionService implements FunctionService<KubelessFunction> {
 
     public static final String RUNTIME_IMAGES_KEY = "runtime-images";
+
     private ApiClient client;
     private ObjectMapper mapper;
-    private ApplicationContext applicationContext;
+
+
     @Getter
     @Setter
     private String kubelessConfigName = "kubeless-config";
     @Getter
     @Setter
     private String kubelessNamespace = "kubeless";
+
     protected CoreV1Api coreV1Api = new CoreV1Api();
+    protected CustomObjectsApi customObjectsApi = new CustomObjectsApi();
+
+    protected final static V1ServicePort v1ServicePort = new V1ServicePortBuilder().withName("http-function-port")
+            .withPort(8080)
+            .withProtocol("TCP")
+            .withTargetPort(new IntOrString(8080))
+            .build();
+
+    private String namespace = "functions";
+
+    public KubelessFunctionService(ApiClient client, ObjectMapper mapper) {
+        this.client = client;
+        this.mapper = mapper;
+    }
 
     @Override
     public Mono<KubelessFunction> create(String clientId, String owner, String name, String runtime, String handler, String contentUrl) {
-        return null;
+
+        FunctionEntity entity = new FunctionEntity();
+        FunctionEntity.Spec spec = new FunctionEntity.Spec();
+        V1ObjectMeta meta = new V1ObjectMeta();
+        entity.setMetadata(meta);
+        entity.setSpec(spec);
+        entity.setKind("Function");
+        entity.setApiVersion("kubeless.io/v1beta1");
+
+        meta.setNamespace(namespace);
+        meta.setName(String.format("c%s-%s", clientId, name));
+        meta.putLabelsItem("clientId", clientId);
+        meta.putLabelsItem("owner", owner);
+        meta.putLabelsItem("name", name);
+
+        spec.setFunction(contentUrl);
+        spec.setRuntime(runtime);
+        spec.setFunctionContentType("url+zip");
+        spec.setHandler(handler);
+
+        V1Deployment deployment = new V1Deployment();
+        spec.setDeployment(deployment);
+
+        V1ServiceSpec service = new V1ServiceSpec();
+        spec.setService(service);
+        service.putSelectorItem("function", meta.getName());
+        service.addPortsItem(v1ServicePort);
+
+        return Mono.create(sink -> sink.onRequest(unused -> {
+            try {
+                Call call = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
+                        "v1beta1",
+                        namespace,
+                        "functions",
+                        entity,
+                        null,
+                        null,
+                        null,
+                        null);
+                this.client.executeAsync(call, FunctionEntity.class, new ApiCallback<FunctionEntity>() {
+                    @Override
+                    public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                        sink.error(e);
+                    }
+
+                    @Override
+                    public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
+                        sink.success(new KubelessFunction(result));
+                    }
+
+                    @Override
+                    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                    }
+
+                    @Override
+                    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                    }
+                });
+            } catch (Exception e) {
+                sink.error(e);
+            }
+        }));
     }
 
     @Override
     public Mono<KubelessFunction> get(String clientId, String name) {
-        return null;
+        return Mono.create(sink -> sink.onRequest(unused ->
+        {
+            try {
+                Call call = customObjectsApi.getNamespacedCustomObjectCall("kubeless.io",
+                        "v1beta1",
+                        namespace,
+                        "functions",
+                        String.format("c%s-%s", clientId, name), null);
+                this.client.executeAsync(call,
+                        FunctionEntity.class,
+                        new ApiCallback<FunctionEntity>() {
+                            @Override
+                            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                                sink.error(e);
+                            }
+
+                            @Override
+                            public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
+                                sink.success(new KubelessFunction(result));
+                            }
+
+                            @Override
+                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                            }
+
+                            @Override
+                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                            }
+                        });
+            } catch (ApiException e) {
+                sink.error(e);
+            }
+        }));
+    }
+
+    @Override
+    public Mono<Void> delete(String clientId, String name) {
+        return Mono.create(sink -> sink.onRequest(unused -> {
+            try {
+                Call call = customObjectsApi.deleteNamespacedCustomObjectCall("kubeless.io",
+                        "v1beta1",
+                        namespace,
+                        "functions",
+                        String.format("c%s-%s", clientId, name),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null);
+                this.client.executeAsync(call, new ApiCallback<Object>() {
+                    @Override
+                    public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                        sink.error(e);
+                    }
+
+                    @Override
+                    public void onSuccess(Object result, int statusCode, Map<String, List<String>> responseHeaders) {
+                        sink.success();
+                    }
+
+                    @Override
+                    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                    }
+
+                    @Override
+                    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                    }
+                });
+            } catch (ApiException e) {
+                sink.error(e);
+            }
+        }));
     }
 
     @Override
     public Flux<KubelessFunction> list(String clientId) {
-        return null;
+        return Flux.create(sink -> sink.onRequest(unused -> {
+            try {
+                Call call = customObjectsApi.listNamespacedCustomObjectCall("kubeless.io",
+                        "v1beta1",
+                        namespace,
+                        "functions",
+                        "",
+                        "",
+                        "",
+                        String.format("clientId=%s", clientId),
+                        null,
+                        "",
+                        null,
+                        null,
+                        null);
+                this.client.executeAsync(call,
+                        FunectionListEntity.class,
+                        new ApiCallback<FunectionListEntity>() {
+                            @Override
+                            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                                sink.error(e);
+                            }
+
+                            @Override
+                            public void onSuccess(FunectionListEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
+                                for (FunctionEntity entity : result.getItems())
+                                    sink.next(new KubelessFunction(entity));
+                                sink.complete();
+                            }
+
+                            @Override
+                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                            }
+
+                            @Override
+                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                            }
+                        });
+            } catch (ApiException e) {
+                sink.error(e);
+            }
+        }));
     }
 
     @Override
-    public Flux<String> getRuntimes() {
+    public Mono<Collection<String>> getRuntimes() {
         return Mono.create(sink -> sink.onRequest(unused ->
                 {
                     try {
@@ -91,8 +288,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                 }))
                 .cast(V1ConfigMap.class)
                 .map(v1ConfigMap -> v1ConfigMap.getData().get(RUNTIME_IMAGES_KEY))
-                .map(this::listRuntimes)
-                .flatMapMany(strings -> Flux.fromIterable(strings));
+                .map(this::listRuntimes);
     }
 
     @SneakyThrows
@@ -107,22 +303,5 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
             }
         }
         return runtimes;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (client == null)
-            client = ClientBuilder.defaultClient();
-        Configuration.setDefaultApiClient(client);
-
-        if (mapper == null)
-            mapper = applicationContext.getBean(ObjectMapper.class);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-
-        this.applicationContext = applicationContext;
     }
 }

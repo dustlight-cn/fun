@@ -34,7 +34,7 @@ public class FunctionStorage implements FunctionStore {
 
 
     protected String generateKey(String clientId, String name) {
-        return String.format("/%s%s/%s.zip", prefix, clientId, name);
+        return String.format("%s%s/%s.zip", prefix, clientId, name);
     }
 
     private static class ByteArrayStorableObject implements StorableObject {
