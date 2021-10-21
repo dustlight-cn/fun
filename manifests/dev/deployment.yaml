@@ -16,7 +16,7 @@ spec:
       labels:
         app: fun-service
     spec:
-      serviceAccountName: flow
+      serviceAccountName: fun
       dnsPolicy: ClusterFirst
       imagePullSecrets:
         - name: aliyun-docker-secret
