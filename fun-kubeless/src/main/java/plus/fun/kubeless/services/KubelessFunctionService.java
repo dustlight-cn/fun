@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import okhttp3.Call;
+import plus.fun.core.exceptions.ErrorEnum;
 import plus.fun.core.service.FunctionService;
 import plus.fun.kubeless.entities.KubelessFunction;
 import plus.fun.kubeless.entities.kubeless.FunctionEntity;
@@ -98,7 +99,10 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                 this.client.executeAsync(call, FunctionEntity.class, new ApiCallback<FunctionEntity>() {
                     @Override
                     public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                        sink.error(e);
+                        if (e.getCode() == 409)
+                            sink.error(ErrorEnum.FUNCTION_EXISTS.getException());
+                        else
+                            sink.error(ErrorEnum.UNKNOWN.details(e).getException());
                     }
 
                     @Override
@@ -137,7 +141,10 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                         new ApiCallback<FunctionEntity>() {
                             @Override
                             public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                sink.error(e);
+                                if (e.getCode() == 404)
+                                    sink.error(ErrorEnum.FUNCTION_NOT_FOUND.getException());
+                                else
+                                    sink.error(ErrorEnum.UNKNOWN.details(e).getException());
                             }
 
                             @Override
@@ -179,7 +186,10 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                 this.client.executeAsync(call, new ApiCallback<Object>() {
                     @Override
                     public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                        sink.error(e);
+                        if (e.getCode() == 404)
+                            sink.error(ErrorEnum.FUNCTION_NOT_FOUND.getException());
+                        else
+                            sink.error(ErrorEnum.UNKNOWN.details(e).getException());
                     }
 
                     @Override
@@ -225,7 +235,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                         new ApiCallback<FunectionListEntity>() {
                             @Override
                             public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                sink.error(e);
+                                sink.error(ErrorEnum.UNKNOWN.details(e).getException());
                             }
 
                             @Override
