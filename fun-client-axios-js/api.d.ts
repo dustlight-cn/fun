@@ -53,19 +53,19 @@ export interface Function {
      * @type {string}
      * @memberof Function
      */
-    updatedAt?: string;
+    createdAt?: string;
     /**
      *
      * @type {string}
      * @memberof Function
      */
-    createdAt?: string;
+    updatedAt?: string;
 }
 /**
- * DefaultApi - axios parameter creator
+ * FunctionsApi - axios parameter creator
  * @export
  */
-export declare const DefaultApiAxiosParamCreator: (configuration?: Configuration) => {
+export declare const FunctionsApiAxiosParamCreator: (configuration?: Configuration) => {
     /**
      *
      * @summary 创建函数
@@ -122,10 +122,10 @@ export declare const DefaultApiAxiosParamCreator: (configuration?: Configuration
     listFunctions: (cid?: string, options?: any) => Promise<RequestArgs>;
 };
 /**
- * DefaultApi - functional programming interface
+ * FunctionsApi - functional programming interface
  * @export
  */
-export declare const DefaultApiFp: (configuration?: Configuration) => {
+export declare const FunctionsApiFp: (configuration?: Configuration) => {
     /**
      *
      * @summary 创建函数
@@ -182,10 +182,10 @@ export declare const DefaultApiFp: (configuration?: Configuration) => {
     listFunctions(cid?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Function>>>;
 };
 /**
- * DefaultApi - factory interface
+ * FunctionsApi - factory interface
  * @export
  */
-export declare const DefaultApiFactory: (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) => {
+export declare const FunctionsApiFactory: (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) => {
     /**
      *
      * @summary 创建函数
@@ -242,12 +242,12 @@ export declare const DefaultApiFactory: (configuration?: Configuration, basePath
     listFunctions(cid?: string, options?: any): AxiosPromise<Array<Function>>;
 };
 /**
- * DefaultApi - object-oriented interface
+ * FunctionsApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class FunctionsApi
  * @extends {BaseAPI}
  */
-export declare class DefaultApi extends BaseAPI {
+export declare class FunctionsApi extends BaseAPI {
     /**
      *
      * @summary 创建函数
@@ -258,7 +258,7 @@ export declare class DefaultApi extends BaseAPI {
      * @param {string} [cid]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     createFunction(name: string, requestBody: Array<string>, runtime?: string, handler?: string, cid?: string, options?: any): Promise<import("axios").AxiosResponse<Function>>;
     /**
@@ -268,7 +268,7 @@ export declare class DefaultApi extends BaseAPI {
      * @param {string} [cid]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     deleteFunction(name: string, cid?: string, options?: any): Promise<import("axios").AxiosResponse<void>>;
     /**
@@ -278,7 +278,7 @@ export declare class DefaultApi extends BaseAPI {
      * @param {string} [cid]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     getFunction(name: string, cid?: string, options?: any): Promise<import("axios").AxiosResponse<Function>>;
     /**
@@ -288,7 +288,7 @@ export declare class DefaultApi extends BaseAPI {
      * @param {string} [cid]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     getFunctionData(name: string, cid?: string, options?: any): Promise<import("axios").AxiosResponse<object>>;
     /**
@@ -296,7 +296,7 @@ export declare class DefaultApi extends BaseAPI {
      * @summary 查询支持的运行环境
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     getRuntimes(options?: any): Promise<import("axios").AxiosResponse<string[]>>;
     /**
@@ -305,7 +305,7 @@ export declare class DefaultApi extends BaseAPI {
      * @param {string} [cid]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     listFunctions(cid?: string, options?: any): Promise<import("axios").AxiosResponse<Function[]>>;
 }

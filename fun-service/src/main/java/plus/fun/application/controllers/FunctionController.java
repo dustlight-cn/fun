@@ -25,7 +25,7 @@ import java.util.Collection;
 @RequestMapping("/v1")
 @SecurityRequirement(name = "auth")
 @CrossOrigin
-@Tag(name = "函数资源", description = "函数相关资源")
+@Tag(name = "Functions", description = "函数相关资源")
 public class FunctionController {
 
     @Autowired

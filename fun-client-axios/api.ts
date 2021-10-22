@@ -62,20 +62,20 @@ export interface Function {
      * @type {string}
      * @memberof Function
      */
-    updatedAt?: string;
+    createdAt?: string;
     /**
      * 
      * @type {string}
      * @memberof Function
      */
-    createdAt?: string;
+    updatedAt?: string;
 }
 
 /**
- * DefaultApi - axios parameter creator
+ * FunctionsApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+export const FunctionsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
@@ -342,11 +342,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 };
 
 /**
- * DefaultApi - functional programming interface
+ * FunctionsApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+export const FunctionsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FunctionsApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -424,11 +424,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 };
 
 /**
- * DefaultApi - factory interface
+ * FunctionsApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DefaultApiFp(configuration)
+export const FunctionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FunctionsApiFp(configuration)
     return {
         /**
          * 
@@ -500,12 +500,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 };
 
 /**
- * DefaultApi - object-oriented interface
+ * FunctionsApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class FunctionsApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
+export class FunctionsApi extends BaseAPI {
     /**
      * 
      * @summary 创建函数
@@ -516,10 +516,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [cid] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public createFunction(name: string, requestBody: Array<string>, runtime?: string, handler?: string, cid?: string, options?: any) {
-        return DefaultApiFp(this.configuration).createFunction(name, requestBody, runtime, handler, cid, options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).createFunction(name, requestBody, runtime, handler, cid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -529,10 +529,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [cid] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public deleteFunction(name: string, cid?: string, options?: any) {
-        return DefaultApiFp(this.configuration).deleteFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).deleteFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -542,10 +542,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [cid] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public getFunction(name: string, cid?: string, options?: any) {
-        return DefaultApiFp(this.configuration).getFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).getFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -555,10 +555,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [cid] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public getFunctionData(name: string, cid?: string, options?: any) {
-        return DefaultApiFp(this.configuration).getFunctionData(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).getFunctionData(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -566,10 +566,10 @@ export class DefaultApi extends BaseAPI {
      * @summary 查询支持的运行环境
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public getRuntimes(options?: any) {
-        return DefaultApiFp(this.configuration).getRuntimes(options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).getRuntimes(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -578,10 +578,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [cid] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof FunctionsApi
      */
     public listFunctions(cid?: string, options?: any) {
-        return DefaultApiFp(this.configuration).listFunctions(cid, options).then((request) => request(this.axios, this.basePath));
+        return FunctionsApiFp(this.configuration).listFunctions(cid, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
