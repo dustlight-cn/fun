@@ -14,8 +14,8 @@ metadata:
   namespace: flow
 rules:
   - apiGroups: [ "", "kubeless.io" ]
-    resources: [ "functions" , "httptriggers" ,"configmap" ]
-    verbs: [ "get", "list", "watch" ]
+    resources: [ "functions" , "httptriggers" ,"configmaps" ]
+    verbs: [ "get", "list", "watch" , "create" ]
 ---
 # 添加角色绑定
 kind: ClusterRoleBinding
