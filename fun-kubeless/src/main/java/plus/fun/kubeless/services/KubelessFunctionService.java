@@ -31,13 +31,17 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
     private ApiClient client;
     private ObjectMapper mapper;
 
-
     @Getter
     @Setter
     private String kubelessConfigName = "kubeless-config";
+
     @Getter
     @Setter
     private String kubelessNamespace = "kubeless";
+
+    @Getter
+    @Setter
+    private String namespace = "functions";
 
     protected CoreV1Api coreV1Api = new CoreV1Api();
     protected CustomObjectsApi customObjectsApi = new CustomObjectsApi();
@@ -48,7 +52,6 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
             .withTargetPort(new IntOrString(8080))
             .build();
 
-    private String namespace = "functions";
 
     public KubelessFunctionService(ApiClient client, ObjectMapper mapper) {
         this.client = client;
@@ -56,7 +59,12 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
     }
 
     @Override
-    public Mono<KubelessFunction> create(String clientId, String owner, String name, String runtime, String handler, String contentUrl) {
+    public Mono<KubelessFunction> create(String clientId,
+                                         String owner,
+                                         String name,
+                                         String runtime,
+                                         String handler,
+                                         String contentUrl) {
 
         FunctionEntity entity = new FunctionEntity();
         FunctionEntity.Spec spec = new FunctionEntity.Spec();
@@ -99,7 +107,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                 this.client.executeAsync(call, FunctionEntity.class, new ApiCallback<FunctionEntity>() {
                     @Override
                     public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                        if (e.getCode() == 409)
+                        if (statusCode == 409)
                             sink.error(ErrorEnum.FUNCTION_EXISTS.getException());
                         else
                             sink.error(ErrorEnum.UNKNOWN.details(e).getException());

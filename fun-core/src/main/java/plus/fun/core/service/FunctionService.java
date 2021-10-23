@@ -8,7 +8,12 @@ import java.util.Collection;
 
 public interface FunctionService<T extends Function> {
 
-    Mono<T> create(String clientId, String owner, String name, String runtime, String handler, String contentUrl);
+    Mono<T> create(String clientId,
+                   String owner,
+                   String name,
+                   String runtime,
+                   String handler,
+                   String contentUrl);
 
     Mono<T> get(String clientId, String name);
 

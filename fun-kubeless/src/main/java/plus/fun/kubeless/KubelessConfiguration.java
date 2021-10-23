@@ -24,9 +24,14 @@ public class KubelessConfiguration {
 
     @Bean
     public KubelessFunctionService kubelessFunctionService(@Autowired ApiClient client,
-                                                           @Autowired ObjectMapper mapper) {
+                                                           @Autowired ObjectMapper mapper,
+                                                           @Autowired KubelessProperties properties) {
         io.kubernetes.client.openapi.Configuration.setDefaultApiClient(client);
-        return new KubelessFunctionService(client, mapper);
+        KubelessFunctionService service = new KubelessFunctionService(client, mapper);
+        service.setNamespace(properties.getFunctionsNamespace());
+        service.setKubelessNamespace(properties.getKubelessNamespace());
+        service.setKubelessConfigName(properties.getKubelessConfigMap());
+        return service;
     }
 
 }
