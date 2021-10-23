@@ -15,10 +15,7 @@ import okhttp3.Call;
 import plus.fun.core.exceptions.ErrorEnum;
 import plus.fun.core.service.FunctionService;
 import plus.fun.kubeless.entities.KubelessFunction;
-import plus.fun.kubeless.entities.kubeless.FunctionEntity;
-import plus.fun.kubeless.entities.kubeless.FunectionListEntity;
-import plus.fun.kubeless.entities.kubeless.RuntimeImage;
-import plus.fun.kubeless.entities.kubeless.RuntimeImages;
+import plus.fun.kubeless.entities.kubeless.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,6 +39,14 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
     @Getter
     @Setter
     private String namespace = "functions";
+
+    @Getter
+    @Setter
+    private String hostFormat = "%s.functions.wgv.ink";
+
+    @Getter
+    @Setter
+    private String ingressClass = "nginx";
 
     protected CoreV1Api coreV1Api = new CoreV1Api();
     protected CustomObjectsApi customObjectsApi = new CustomObjectsApi();
@@ -93,6 +98,26 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
         service.putSelectorItem("function", meta.getName());
         service.addPortsItem(v1ServicePort);
 
+        HttpTriggerEntity httpTrigger = new HttpTriggerEntity();
+        V1ObjectMeta meta1 = new V1ObjectMeta();
+        HttpTriggerEntity.Spec spec1 = new HttpTriggerEntity.Spec();
+        httpTrigger.setMetadata(meta1);
+        httpTrigger.setSpec(spec1);
+        httpTrigger.setKind("HTTPTrigger");
+        httpTrigger.setApiVersion("kubeless.io/v1beta1");
+
+        meta1.setNamespace(namespace);
+        meta1.setName(String.format("c%s-%s", clientId, name));
+        meta1.putLabelsItem("clientId", clientId);
+        meta1.putLabelsItem("owner", owner);
+        meta1.putLabelsItem("name", name);
+
+        spec1.setFunctionName(name);
+        spec1.setHostName(String.format(hostFormat, clientId));
+        spec1.setGateway(ingressClass);
+        spec1.setPath(name);
+        spec1.setCorsEnable(true);
+
         return Mono.create(sink -> sink.onRequest(unused -> {
             try {
                 Call call = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
@@ -110,12 +135,45 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                         if (statusCode == 409)
                             sink.error(ErrorEnum.FUNCTION_EXISTS.getException());
                         else
-                            sink.error(ErrorEnum.UNKNOWN.details(e).getException());
+                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
                     }
 
                     @Override
                     public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
-                        sink.success(new KubelessFunction(result));
+                        try {
+                            Call c = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
+                                    "v1beta1",
+                                    namespace,
+                                    "httptriggers",
+                                    httpTrigger,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
+                            client.executeAsync(c, new ApiCallback<Object>() {
+                                @Override
+                                public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+                                }
+
+                                @Override
+                                public void onSuccess(Object resultx, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.success(new KubelessFunction(result));
+                                }
+
+                                @Override
+                                public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                                }
+
+                                @Override
+                                public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                                }
+                            });
+                        } catch (ApiException e) {
+                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+                        }
                     }
 
                     @Override
@@ -129,7 +187,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                     }
                 });
             } catch (Exception e) {
-                sink.error(e);
+                sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
             }
         }));
     }
@@ -197,12 +255,47 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                         if (e.getCode() == 404)
                             sink.error(ErrorEnum.FUNCTION_NOT_FOUND.getException());
                         else
-                            sink.error(ErrorEnum.UNKNOWN.details(e).getException());
+                            sink.error(ErrorEnum.DELETE_FUNCTION_FAILED.details(e).getException());
                     }
 
                     @Override
                     public void onSuccess(Object result, int statusCode, Map<String, List<String>> responseHeaders) {
-                        sink.success();
+                        try {
+                            Call c = customObjectsApi.deleteNamespacedCustomObjectCall("kubeless.io",
+                                    "v1beta1",
+                                    namespace,
+                                    "httptriggers",
+                                    String.format("c%s-%s", clientId, name),
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
+                            client.executeAsync(c, new ApiCallback<Object>() {
+                                @Override
+                                public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.error(ErrorEnum.DELETE_FUNCTION_FAILED.details(e).getException());
+                                }
+
+                                @Override
+                                public void onSuccess(Object result, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.success();
+                                }
+
+                                @Override
+                                public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                                }
+
+                                @Override
+                                public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                                }
+                            });
+                        } catch (ApiException e) {
+                            sink.error(ErrorEnum.DELETE_FUNCTION_FAILED.details(e).getException());
+                        }
                     }
 
                     @Override
@@ -216,7 +309,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                     }
                 });
             } catch (ApiException e) {
-                sink.error(e);
+                sink.error(ErrorEnum.DELETE_FUNCTION_FAILED.details(e).getException());
             }
         }));
     }

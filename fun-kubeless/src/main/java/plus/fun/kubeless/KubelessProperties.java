@@ -12,5 +12,7 @@ public class KubelessProperties {
     private String functionsNamespace = "functions";
     private String kubelessNamespace = "kubeless";
     private String kubelessConfigMap = "kubeless-config";
+    private String hostFormat = "%s.functions.wgv.ink";
+    private String ingressClass = "nginx";
 
 }

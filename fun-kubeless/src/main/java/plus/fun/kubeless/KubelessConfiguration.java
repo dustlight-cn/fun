@@ -31,6 +31,9 @@ public class KubelessConfiguration {
         service.setNamespace(properties.getFunctionsNamespace());
         service.setKubelessNamespace(properties.getKubelessNamespace());
         service.setKubelessConfigName(properties.getKubelessConfigMap());
+
+        service.setHostFormat(properties.getHostFormat());
+        service.setIngressClass(properties.getIngressClass());
         return service;
     }
 
