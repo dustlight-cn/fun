@@ -8,7 +8,6 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.apis.CustomObjectsApi;
 import io.kubernetes.client.openapi.models.*;
-import io.kubernetes.client.util.Watch;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
