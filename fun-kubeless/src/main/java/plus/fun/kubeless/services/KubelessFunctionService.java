@@ -8,6 +8,7 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.apis.CustomObjectsApi;
 import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.util.Watch;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -112,7 +113,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
         meta1.putLabelsItem("owner", owner);
         meta1.putLabelsItem("name", name);
 
-        spec1.setFunctionName(name);
+        spec1.setFunctionName(meta.getName());
         spec1.setHostName(String.format(hostFormat, clientId));
         spec1.setGateway(ingressClass);
         spec1.setPath(name);
@@ -141,6 +142,8 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                     @Override
                     public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
                         try {
+                            Thread.sleep(1000);
+
                             Call c = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
                                     "v1beta1",
                                     namespace,
@@ -171,7 +174,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
 
                                 }
                             });
-                        } catch (ApiException e) {
+                        } catch (ApiException | InterruptedException e) {
                             sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
                         }
                     }
