@@ -74,10 +74,6 @@
             <groupId>plus.auth</groupId>
             <artifactId>auth-resource-server-reactive</artifactId>
         </dependency>
-        <dependency>
-            <groupId>plus.auth</groupId>
-            <artifactId>auth-client-reactive</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>cn.dustlight.storage</groupId>

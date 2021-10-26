@@ -9,18 +9,20 @@ data:
     plus:
       oauth2:
         client:
-          client-id: 877ce1dd5030000
-          client-secret: 1283d148237af330152929cfe05ec045b0a4e92d
+          client-id: 906b01199830000
+          client-secret: a18892f0d2272d66800e6955a68bfd58c3c975c0
           api-endpoint: http://auth-service.auth
           token-uri: http://auth-service.auth/v1/oauth/token
         resource-server:
           jwk-set-uri: http://auth-service.auth/v1/jwk
-          client-secret: none
-          client-id: none
+          client-secret: a18892f0d2272d66800e6955a68bfd58c3c975c0
+          client-id: 906b01199830000
           uri: http://auth-service.auth/v1/token/validity
           token-type: jwt
       fun:
         authorization-endpoint: "http://accounts.wgv.ink/authorize"
+        system:
+          system-function-prefix: system
     dustlight:
       storage:
         minio:

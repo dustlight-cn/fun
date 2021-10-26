@@ -14,4 +14,11 @@ public class ClientUtils {
                     .flatMap(aBoolean -> aBoolean ? Mono.just(clientId) : Mono.error(ErrorEnum.ACCESS_DENIED.getException()));
         return Mono.just(principal.getClientId());
     }
+
+    public static Mono<String> obtainClientIdRequireMember(ReactiveAuthClient client, String clientId, AuthPrincipal principal) {
+        if (StringUtils.hasText(clientId) && !client.equals(principal.getClientId()))
+            return client.isClientMember(principal.getUid(), clientId)
+                    .flatMap(aBoolean -> aBoolean ? Mono.just(clientId) : Mono.error(ErrorEnum.ACCESS_DENIED.getException()));
+        return principal.isMember() || principal.getUid() == null ? Mono.just(principal.getClientId()) : Mono.error(ErrorEnum.ACCESS_DENIED.getException());
+    }
 }
