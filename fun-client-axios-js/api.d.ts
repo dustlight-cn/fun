@@ -53,13 +53,13 @@ export interface Function {
      * @type {string}
      * @memberof Function
      */
-    createdAt?: string;
+    updatedAt?: string;
     /**
      *
      * @type {string}
      * @memberof Function
      */
-    updatedAt?: string;
+    createdAt?: string;
 }
 /**
  * FunctionsApi - axios parameter creator
