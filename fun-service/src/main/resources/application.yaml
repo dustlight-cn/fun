@@ -19,7 +19,7 @@ plus:
 dustlight:
   storage:
     minio:
-      endpoint: http://oss.wgv
+      endpoint: http://functions.oss.wgv.ink
       bucket: functions
       secret-access-key: l1ezn4IgqG61ClxSmrwQOXMHVHqCya5YiJk3hDL1
       access-key-id: 92GYTM1U7M76OQO740BW
