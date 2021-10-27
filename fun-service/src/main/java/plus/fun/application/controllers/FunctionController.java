@@ -11,9 +11,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import plus.auth.client.reactive.ReactiveAuthClient;
+import plus.auth.resources.AuthPrincipalUtil;
 import plus.auth.resources.AuthResourceServerProperties;
 import plus.auth.resources.core.AuthPrincipal;
-import plus.fun.application.ClientUtils;
 import plus.fun.application.configurations.SystemProperties;
 import plus.fun.core.entities.Function;
 import plus.fun.core.service.FunctionService;
@@ -52,7 +52,7 @@ public class FunctionController {
                                          @RequestBody byte[] data,
                                          ReactiveAuthClient reactiveAuthClient,
                                          AuthPrincipal principal) {
-        return ClientUtils.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
+        return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMap(cid -> store.store(cid, name, data)
                         .flatMap(url -> functionService.create(cid, principal.getUidString(), name, runtime, handler, url)));
@@ -64,7 +64,7 @@ public class FunctionController {
                                       @RequestParam(name = "cid", required = false) String clientId,
                                       ReactiveAuthClient reactiveAuthClient,
                                       AuthPrincipal principal) {
-        return ClientUtils.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
+        return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMap(cid -> functionService.get(cid, name));
     }
@@ -76,7 +76,7 @@ public class FunctionController {
                                                 ServerWebExchange exchange,
                                                 ReactiveAuthClient reactiveAuthClient,
                                                 AuthPrincipal principal) {
-        return ClientUtils.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
+        return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMap(cid -> functionService.get(cid, name)
                         .flatMap(function -> store.getUrl(cid, function.getName())))
@@ -90,7 +90,7 @@ public class FunctionController {
                                      @RequestParam(name = "cid", required = false) String clientId,
                                      ReactiveAuthClient reactiveAuthClient,
                                      AuthPrincipal principal) {
-        return ClientUtils.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
+        return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMap(cid -> functionService.delete(cid, name));
     }
@@ -100,7 +100,7 @@ public class FunctionController {
     public Flux<Function> listFunctions(@RequestParam(name = "cid", required = false) String clientId,
                                         ReactiveAuthClient reactiveAuthClient,
                                         AuthPrincipal principal) {
-        return ClientUtils.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
+        return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMapMany(cid -> functionService.list(cid));
     }
