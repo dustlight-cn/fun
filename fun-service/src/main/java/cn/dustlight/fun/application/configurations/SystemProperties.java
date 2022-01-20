@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "plus.fun.system")
+@ConfigurationProperties(prefix = "dustlight.fun.system")
 public class SystemProperties {
 
     private String systemFunctionPrefix = "system.";

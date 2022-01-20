@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
         scheme = "Bearer",
         flows =  @OAuthFlows(
                 implicit = @OAuthFlow(
-                        authorizationUrl="${plus.fun.authorization-endpoint}")
+                        authorizationUrl="${dustlight.fun.authorization-endpoint}")
         )
 )
 )

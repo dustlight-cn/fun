@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "plus.fun.store")
+@ConfigurationProperties(prefix = "dustlight.fun.store")
 public class FunctionStorageProperties {
 
     /**

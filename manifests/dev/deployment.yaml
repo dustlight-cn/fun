@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fun-service
-  namespace: flow
   labels:
     app: fun-service
 spec:

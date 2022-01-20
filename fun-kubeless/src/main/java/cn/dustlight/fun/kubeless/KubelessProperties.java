@@ -6,13 +6,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "plus.fun.kubeless")
+@ConfigurationProperties(prefix = "dustlight.fun.kubeless")
 public class KubelessProperties {
 
     private String functionsNamespace = "functions";
     private String kubelessNamespace = "kubeless";
     private String kubelessConfigMap = "kubeless-config";
-    private String hostFormat = "%s.functions.wgv.ink";
+    private String hostFormat = "%s.fun.dustlight.cn";
     private String ingressClass = "nginx";
 
 }

@@ -3,34 +3,32 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fun-service-config
-  namespace: flow
 data:
   application.yaml: |-
-    plus:
-      oauth2:
-        client:
-          client-id: 906b01199830000
-          client-secret: a18892f0d2272d66800e6955a68bfd58c3c975c0
-          api-endpoint: http://auth-service.auth
-          token-uri: http://auth-service.auth/v1/oauth/token
-        resource-server:
-          jwk-set-uri: http://auth-service.auth/v1/jwk
-          client-secret: a18892f0d2272d66800e6955a68bfd58c3c975c0
-          client-id: 906b01199830000
-          uri: http://auth-service.auth/v1/token/validity
-          token-type: jwt
+    client:
+      id: test
+      secret: e6423085f5165a58f8949e763c6691ffe44e2f86
+
+    dustlight:
       fun:
-        authorization-endpoint: "http://accounts.wgv.ink/authorize"
+        authorization-endpoint: "https://accounts.dustlight.cn/authorize"
         system:
           system-function-prefix: system
-    dustlight:
+      auth:
+        oauth2:
+          client:
+            client-id: ${client.id}
+            client-secret: ${client.secret}
+          resource-server:
+            client-id: ${client.id}
+            client-secret: ${client.secret}
       storage:
         minio:
-          endpoint: http://functions.oss.wgv.ink
-          bucket: functions
-          secret-access-key: l1ezn4IgqG61ClxSmrwQOXMHVHqCya5YiJk3hDL1
-          access-key-id: 92GYTM1U7M76OQO740BW
-          region: gz-wgv
+          endpoint: http://fun-dev.oss.dustlight.cn
+          bucket: fun-dev
+          access-key-id: SIIP49JG7V4IO6N78HAE
+          secret-access-key: Dn+LxRvuQOejZju+n+EymEMgoC4KuuaqEVAgVBBY
+          region: gz
     # SpringDoc 配置
     springdoc:
       api-docs:
@@ -39,9 +37,9 @@ data:
       swagger-ui:
         path: /doc.html
         oauth:
-          client-id: 86c3e34e2030000
+          client-id: ${client.id}
           additional-query-string-params:
             jwt: true
     logging:
       level:
-        plus.fun.*: debug
+        cn.dustlight.fun.*: debug
