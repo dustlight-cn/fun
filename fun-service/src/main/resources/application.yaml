@@ -37,4 +37,4 @@ springdoc:
         jwt: true
 logging:
   level:
-    plus.fun.*: debug
+    cn.dustlight.fun.*: debug

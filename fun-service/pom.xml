@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>plus.fun</groupId>
+        <groupId>cn.dustlight.fun</groupId>
         <artifactId>fun-parent</artifactId>
         <version>0.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -58,20 +58,20 @@
         </dependency>
 
         <dependency>
-            <groupId>plus.fun</groupId>
+            <groupId>cn.dustlight.fun</groupId>
             <artifactId>fun-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>plus.fun</groupId>
+            <groupId>cn.dustlight.fun</groupId>
             <artifactId>fun-kubeless</artifactId>
         </dependency>
         <dependency>
-            <groupId>plus.fun</groupId>
+            <groupId>cn.dustlight.fun</groupId>
             <artifactId>fun-store</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>plus.auth</groupId>
+            <groupId>cn.dustlight.auth</groupId>
             <artifactId>auth-resource-server-reactive</artifactId>
         </dependency>
 

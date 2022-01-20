@@ -1,5 +1,5 @@
 {
-  "name": "@plus/fun-client-axios",
+  "name": "@dustlight/fun-client-axios",
   "version": "0.0.2-alpha",
   "description": "Client SDK for Fun-Service",
   "main": "index.ts",
