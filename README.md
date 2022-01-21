@@ -1,28 +1,20 @@
-# Fun
-[简介](#简介) | [功能](#功能) | [构建](#构建) | [部署](#部署)
+## Usage
 
-## 简介
-Serverless Interface
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
+Helm's [documentation](https://helm.sh/docs) to get started.
 
-#### 功能
-* 提供无服务接口
+Once Helm has been set up correctly, add the repo as follows:
 
-#### 技术栈
-* Spring Boot
-* OAuth2.0
-* Serverless
+    helm repo add fun https://dustlight-cn.github.io/fun
 
-## 构建
-```shell
-mvn package
-```
+If you had already added this repo earlier, run `helm repo update` to retrieve
+the latest versions of the packages.  You can then run `helm search repo
+fun` to see the charts.
 
-## 部署
-待完善
+To install the <chart-name> chart:
 
-## Kubeless 安装
-```bash
-export RELEASE=$(curl -s -L https://api.github.com/repos/vmware-archive/kubeless/releases/latest | grep tag_name | cut -d '"' -f 4)
-kubectl create ns kubeless
-kubectl create -f https://github.com/kubeless/kubeless/releases/download/$RELEASE/kubeless-$RELEASE.yaml
-```
+    helm install my-fun fun/fun
+
+To uninstall the chart:
+
+    helm delete my-fun
