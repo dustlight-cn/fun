@@ -25,13 +25,107 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FunctionsApi = exports.FunctionsApiFactory = exports.FunctionsApiFp = exports.FunctionsApiAxiosParamCreator = void 0;
+exports.FunctionsApi = exports.FunctionsApiFactory = exports.FunctionsApiFp = exports.FunctionsApiAxiosParamCreator = exports.ConfigsApi = exports.ConfigsApiFactory = exports.ConfigsApiFp = exports.ConfigsApiAxiosParamCreator = void 0;
 const axios_1 = __importDefault(require("axios"));
 // Some imports not used depending on template conditions
 // @ts-ignore
 const common_1 = require("./common");
 // @ts-ignore
 const base_1 = require("./base");
+/**
+ * ConfigsApi - axios parameter creator
+ * @export
+ */
+const ConfigsApiAxiosParamCreator = function (configuration) {
+    return {
+        /**
+         *
+         * @summary 获取函数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getConfiguration: (options = {}) => __awaiter(this, void 0, void 0, function* () {
+            const localVarPath = `/v1/config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, common_1.DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = Object.assign(Object.assign({ method: 'GET' }, baseOptions), options);
+            const localVarHeaderParameter = {};
+            const localVarQueryParameter = {};
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
+            return {
+                url: (0, common_1.toPathString)(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        }),
+    };
+};
+exports.ConfigsApiAxiosParamCreator = ConfigsApiAxiosParamCreator;
+/**
+ * ConfigsApi - functional programming interface
+ * @export
+ */
+const ConfigsApiFp = function (configuration) {
+    const localVarAxiosParamCreator = (0, exports.ConfigsApiAxiosParamCreator)(configuration);
+    return {
+        /**
+         *
+         * @summary 获取函数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getConfiguration(options) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const localVarAxiosArgs = yield localVarAxiosParamCreator.getConfiguration(options);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+            });
+        },
+    };
+};
+exports.ConfigsApiFp = ConfigsApiFp;
+/**
+ * ConfigsApi - factory interface
+ * @export
+ */
+const ConfigsApiFactory = function (configuration, basePath, axios) {
+    const localVarFp = (0, exports.ConfigsApiFp)(configuration);
+    return {
+        /**
+         *
+         * @summary 获取函数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getConfiguration(options) {
+            return localVarFp.getConfiguration(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+exports.ConfigsApiFactory = ConfigsApiFactory;
+/**
+ * ConfigsApi - object-oriented interface
+ * @export
+ * @class ConfigsApi
+ * @extends {BaseAPI}
+ */
+class ConfigsApi extends base_1.BaseAPI {
+    /**
+     *
+     * @summary 获取函数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ConfigsApi
+     */
+    getConfiguration(options) {
+        return (0, exports.ConfigsApiFp)(this.configuration).getConfiguration(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+exports.ConfigsApi = ConfigsApi;
 /**
  * FunctionsApi - axios parameter creator
  * @export
@@ -51,9 +145,9 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
          */
         createFunction: (name, requestBody, runtime, handler, cid, options = {}) => __awaiter(this, void 0, void 0, function* () {
             // verify required parameter 'name' is not null or undefined
-            common_1.assertParamExists('createFunction', 'name', name);
+            (0, common_1.assertParamExists)('createFunction', 'name', name);
             // verify required parameter 'requestBody' is not null or undefined
-            common_1.assertParamExists('createFunction', 'requestBody', requestBody);
+            (0, common_1.assertParamExists)('createFunction', 'requestBody', requestBody);
             const localVarPath = `/v1/function/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -67,7 +161,7 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
             if (runtime !== undefined) {
                 localVarQueryParameter['runtime'] = runtime;
             }
@@ -78,12 +172,12 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
                 localVarQueryParameter['cid'] = cid;
             }
             localVarHeaderParameter['Content-Type'] = 'application/octet-stream';
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
-            localVarRequestOptions.data = common_1.serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration);
+            localVarRequestOptions.data = (0, common_1.serializeDataIfNeeded)(requestBody, localVarRequestOptions, configuration);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -97,7 +191,7 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
          */
         deleteFunction: (name, cid, options = {}) => __awaiter(this, void 0, void 0, function* () {
             // verify required parameter 'name' is not null or undefined
-            common_1.assertParamExists('deleteFunction', 'name', name);
+            (0, common_1.assertParamExists)('deleteFunction', 'name', name);
             const localVarPath = `/v1/function/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -111,15 +205,15 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
             if (cid !== undefined) {
                 localVarQueryParameter['cid'] = cid;
             }
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -133,7 +227,7 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
          */
         getFunction: (name, cid, options = {}) => __awaiter(this, void 0, void 0, function* () {
             // verify required parameter 'name' is not null or undefined
-            common_1.assertParamExists('getFunction', 'name', name);
+            (0, common_1.assertParamExists)('getFunction', 'name', name);
             const localVarPath = `/v1/function/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -147,15 +241,15 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
             if (cid !== undefined) {
                 localVarQueryParameter['cid'] = cid;
             }
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -169,7 +263,7 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
          */
         getFunctionData: (name, cid, options = {}) => __awaiter(this, void 0, void 0, function* () {
             // verify required parameter 'name' is not null or undefined
-            common_1.assertParamExists('getFunctionData', 'name', name);
+            (0, common_1.assertParamExists)('getFunctionData', 'name', name);
             const localVarPath = `/v1/function/{name}/data`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -183,15 +277,15 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
             if (cid !== undefined) {
                 localVarQueryParameter['cid'] = cid;
             }
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -214,12 +308,12 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -243,15 +337,15 @@ const FunctionsApiAxiosParamCreator = function (configuration) {
             const localVarQueryParameter = {};
             // authentication auth required
             // oauth required
-            yield common_1.setOAuthToObject(localVarHeaderParameter, "auth", [], configuration);
+            yield (0, common_1.setOAuthToObject)(localVarHeaderParameter, "auth", [], configuration);
             if (cid !== undefined) {
                 localVarQueryParameter['cid'] = cid;
             }
-            common_1.setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            (0, common_1.setSearchParams)(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = Object.assign(Object.assign(Object.assign({}, localVarHeaderParameter), headersFromBaseOptions), options.headers);
             return {
-                url: common_1.toPathString(localVarUrlObj),
+                url: (0, common_1.toPathString)(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         }),
@@ -263,7 +357,7 @@ exports.FunctionsApiAxiosParamCreator = FunctionsApiAxiosParamCreator;
  * @export
  */
 const FunctionsApiFp = function (configuration) {
-    const localVarAxiosParamCreator = exports.FunctionsApiAxiosParamCreator(configuration);
+    const localVarAxiosParamCreator = (0, exports.FunctionsApiAxiosParamCreator)(configuration);
     return {
         /**
          *
@@ -279,7 +373,7 @@ const FunctionsApiFp = function (configuration) {
         createFunction(name, requestBody, runtime, handler, cid, options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.createFunction(name, requestBody, runtime, handler, cid, options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
         /**
@@ -293,7 +387,7 @@ const FunctionsApiFp = function (configuration) {
         deleteFunction(name, cid, options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.deleteFunction(name, cid, options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
         /**
@@ -307,7 +401,7 @@ const FunctionsApiFp = function (configuration) {
         getFunction(name, cid, options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.getFunction(name, cid, options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
         /**
@@ -321,7 +415,7 @@ const FunctionsApiFp = function (configuration) {
         getFunctionData(name, cid, options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.getFunctionData(name, cid, options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
         /**
@@ -333,7 +427,7 @@ const FunctionsApiFp = function (configuration) {
         getRuntimes(options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.getRuntimes(options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
         /**
@@ -346,7 +440,7 @@ const FunctionsApiFp = function (configuration) {
         listFunctions(cid, options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localVarAxiosArgs = yield localVarAxiosParamCreator.listFunctions(cid, options);
-                return common_1.createRequestFunction(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
+                return (0, common_1.createRequestFunction)(localVarAxiosArgs, axios_1.default, base_1.BASE_PATH, configuration);
             });
         },
     };
@@ -357,7 +451,7 @@ exports.FunctionsApiFp = FunctionsApiFp;
  * @export
  */
 const FunctionsApiFactory = function (configuration, basePath, axios) {
-    const localVarFp = exports.FunctionsApiFp(configuration);
+    const localVarFp = (0, exports.FunctionsApiFp)(configuration);
     return {
         /**
          *
@@ -448,7 +542,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     createFunction(name, requestBody, runtime, handler, cid, options) {
-        return exports.FunctionsApiFp(this.configuration).createFunction(name, requestBody, runtime, handler, cid, options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).createFunction(name, requestBody, runtime, handler, cid, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      *
@@ -460,7 +554,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     deleteFunction(name, cid, options) {
-        return exports.FunctionsApiFp(this.configuration).deleteFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).deleteFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      *
@@ -472,7 +566,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     getFunction(name, cid, options) {
-        return exports.FunctionsApiFp(this.configuration).getFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).getFunction(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      *
@@ -484,7 +578,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     getFunctionData(name, cid, options) {
-        return exports.FunctionsApiFp(this.configuration).getFunctionData(name, cid, options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).getFunctionData(name, cid, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      *
@@ -494,7 +588,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     getRuntimes(options) {
-        return exports.FunctionsApiFp(this.configuration).getRuntimes(options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).getRuntimes(options).then((request) => request(this.axios, this.basePath));
     }
     /**
      *
@@ -505,7 +599,7 @@ class FunctionsApi extends base_1.BaseAPI {
      * @memberof FunctionsApi
      */
     listFunctions(cid, options) {
-        return exports.FunctionsApiFp(this.configuration).listFunctions(cid, options).then((request) => request(this.axios, this.basePath));
+        return (0, exports.FunctionsApiFp)(this.configuration).listFunctions(cid, options).then((request) => request(this.axios, this.basePath));
     }
 }
 exports.FunctionsApi = FunctionsApi;

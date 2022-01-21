@@ -15,6 +15,37 @@ import { RequestArgs, BaseAPI } from './base';
 /**
  *
  * @export
+ * @interface Config
+ */
+export interface Config {
+    /**
+     *
+     * @type {string}
+     * @memberof Config
+     */
+    authEndpoint?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof Config
+     */
+    hostFormat?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof Config
+     */
+    tokenUri?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof Config
+     */
+    authorizationUri?: string;
+}
+/**
+ *
+ * @export
  * @interface Function
  */
 export interface Function {
@@ -60,6 +91,61 @@ export interface Function {
      * @memberof Function
      */
     createdAt?: string;
+}
+/**
+ * ConfigsApi - axios parameter creator
+ * @export
+ */
+export declare const ConfigsApiAxiosParamCreator: (configuration?: Configuration) => {
+    /**
+     *
+     * @summary 获取函数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getConfiguration: (options?: any) => Promise<RequestArgs>;
+};
+/**
+ * ConfigsApi - functional programming interface
+ * @export
+ */
+export declare const ConfigsApiFp: (configuration?: Configuration) => {
+    /**
+     *
+     * @summary 获取函数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getConfiguration(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Config>>;
+};
+/**
+ * ConfigsApi - factory interface
+ * @export
+ */
+export declare const ConfigsApiFactory: (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) => {
+    /**
+     *
+     * @summary 获取函数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getConfiguration(options?: any): AxiosPromise<Config>;
+};
+/**
+ * ConfigsApi - object-oriented interface
+ * @export
+ * @class ConfigsApi
+ * @extends {BaseAPI}
+ */
+export declare class ConfigsApi extends BaseAPI {
+    /**
+     *
+     * @summary 获取函数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ConfigsApi
+     */
+    getConfiguration(options?: any): Promise<import("axios").AxiosResponse<Config>>;
 }
 /**
  * FunctionsApi - axios parameter creator
