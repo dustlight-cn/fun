@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fun-service
+  name: {{ .Release.Name }}-service
   labels:
-    app: fun-service
+    app: {{ .Release.Name }}-service
 spec:
   ports:
     - port: 80
       targetPort: 8080
       name: http
   selector:
-    app: fun-service
+    app: {{ .Release.Name }}-service
   type: ClusterIP

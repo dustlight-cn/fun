@@ -2,14 +2,14 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: fun-service
+  name: {{ .Release.Name }}-service
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
     - http:
         paths:
           - path: /
             backend:
-              serviceName: fun-service
+              serviceName: {{ .Release.Name }}-service
               servicePort: 80
-      host: fun.dustlight.cn
+      host: {{ .Values.ingress.host }}

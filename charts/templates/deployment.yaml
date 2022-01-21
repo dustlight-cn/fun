@@ -2,26 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fun-service
+  name: {{ .Release.Name }}-service
   labels:
-    app: fun-service
+    app: {{ .Release.Name }}-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: fun-service
+      app: {{ .Release.Name }}-service
   template:
     metadata:
       labels:
-        app: fun-service
+        app: {{ .Release.Name }}-service
     spec:
-      serviceAccountName: fun
+      serviceAccountName: {{ .Release.Name }}
       dnsPolicy: ClusterFirst
-      imagePullSecrets:
-        - name: aliyun-docker-secret
       containers:
-        - name: fun-service
-          image: ${SERVICE_IMAGE}
+        - name: {{ .Release.Name }}-service
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -52,7 +50,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: fun-service-config
+            name: {{ .Release.Name }}-service-config
             items:
               - key: application.yaml
                 path: application.yaml

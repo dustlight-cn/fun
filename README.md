@@ -19,3 +19,10 @@ mvn package
 
 ## 部署
 待完善
+
+## Kubeless 安装
+```bash
+export RELEASE=$(curl -s -L https://api.github.com/repos/vmware-archive/kubeless/releases/latest | grep tag_name | cut -d '"' -f 4)
+kubectl create ns kubeless
+kubectl create -f https://github.com/kubeless/kubeless/releases/download/$RELEASE/kubeless-$RELEASE.yaml
+```

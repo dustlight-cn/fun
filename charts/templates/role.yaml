@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: fun
+  name: {{ .Release.Name }}
 automountServiceAccountToken: true
 ---
 # 添加角色
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: fun-reader
+  name: {{ .Release.Name }}-reader
 rules:
   - apiGroups: [ "", "kubeless.io" ]
     resources: [ "functions" , "httptriggers" ,"configmaps" ]
@@ -19,12 +19,13 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: fun-reader-binding
+  name: {{ .Release.Name }}-reader-binding
 subjects:
   - kind: ServiceAccount
-    name: fun
+    name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
     apiGroup: ""
 roleRef:
   kind: ClusterRole
-  name: fun-reader
+  name: {{ .Release.Name }}-reader
   apiGroup: ""
