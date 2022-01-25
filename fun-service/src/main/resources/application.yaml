@@ -28,12 +28,12 @@ dustlight:
         uri: ${client.checkTokenUri}
         jwk-set-uri: ${client.jwkSetUri}
   storage:
-    minio:
-      endpoint: http://fun-dev.oss.dustlight.cn
-      bucket: fun-dev
-      access-key-id: SIIP49JG7V4IO6N78HAE
-      secret-access-key: Dn+LxRvuQOejZju+n+EymEMgoC4KuuaqEVAgVBBY
-      region: gz
+#    minio:
+#      endpoint: http://fun-dev.oss.dustlight.cn
+#      bucket: fun-dev
+#      access-key-id: SIIP49JG7V4IO6N78HAE
+#      secret-access-key: Dn+LxRvuQOejZju+n+EymEMgoC4KuuaqEVAgVBBY
+#      region: gz
 #    tencent:
 #      cos:
 #        bucket: BUCKET
