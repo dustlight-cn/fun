@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   fun:
   - apiVersion: v2
+    appVersion: 0.0.3-alpha
+    created: "2022-01-26T12:18:02.808138045Z"
+    description: Serverless service
+    digest: 1892e74c59a5e5d103c9cc51245e2386e97e379a8476f9f9c48f5fd74dcff827
+    name: fun
+    type: application
+    urls:
+    - https://github.com/dustlight-cn/fun/releases/download/fun-0.0.3/fun-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.0.2-alpha-1
     created: "2022-01-23T16:44:18.999217558Z"
     description: Serverless service
@@ -21,4 +31,4 @@ entries:
     urls:
     - https://github.com/dustlight-cn/fun/releases/download/fun-0.0.1/fun-0.0.1.tgz
     version: 0.0.1
-generated: "2022-01-26T10:01:50.121332427Z"
+generated: "2022-01-26T12:18:02.808150645Z"
