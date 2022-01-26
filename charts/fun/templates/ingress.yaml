@@ -9,7 +9,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
-      secretName: {{ .Release.Name }}-auth-service-tls
+      secretName: {{ .Release.Name }}-fun-service-tls
   {{ end }}
   rules:
     - http:
