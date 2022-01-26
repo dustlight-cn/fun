@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -30,12 +31,13 @@ public class ConfigController {
 
     private static Config config;
 
-    @Operation(summary = "获取函数")
+    @Operation(summary = "获取配置")
     @GetMapping(value = "/config")
     public Mono<Config> getConfiguration() {
         return Mono.justOrEmpty(config)
                 .switchIfEmpty(Mono.just(config = new Config(clientProperties.getApiEndpoint(),
-                        kubelessProperties.getHostFormat(),
+                        String.format(StringUtils.hasText(kubelessProperties.getHostTls()) ?
+                                "https://%s" : "http://%s", kubelessProperties.getHostFormat()),
                         clientProperties.getTokenUri(),
                         authorizationUri)));
     }

@@ -5,6 +5,12 @@ metadata:
   name: {{ .Release.Name }}-service
 spec:
   ingressClassName: {{ .Values.ingress.className }}
+  {{ if .Values.ingress.tls.host.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Release.Name }}-auth-service-tls
+  {{ end }}
   rules:
     - http:
         paths:

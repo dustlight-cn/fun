@@ -1,6 +1,6 @@
 
-Swagger UI: http://{{ .Values.ingress.host }}/doc.html
-OpenAPI: http://{{ .Values.ingress.host }}/doc
+Swagger UI: http{{ if .Values.ingress.tls.host }}s{{ end }}://{{ .Values.ingress.host }}/doc.html
+OpenAPI: http{{ if .Values.ingress.tls.host }}s{{ end }}://{{ .Values.ingress.host }}/doc
 
 Github: https://github.com/dustlight-cn/fun
 

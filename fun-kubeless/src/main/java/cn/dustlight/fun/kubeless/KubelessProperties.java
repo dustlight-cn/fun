@@ -13,6 +13,7 @@ public class KubelessProperties {
     private String kubelessNamespace = "kubeless";
     private String kubelessConfigMap = "kubeless-config";
     private String hostFormat = "%s.fun.dustlight.cn";
+    private String hostTls = "";
     private String ingressClass = "nginx";
 
 }

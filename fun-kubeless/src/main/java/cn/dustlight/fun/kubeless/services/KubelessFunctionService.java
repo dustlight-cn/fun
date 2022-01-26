@@ -16,6 +16,7 @@ import okhttp3.Call;
 import cn.dustlight.fun.core.exceptions.ErrorEnum;
 import cn.dustlight.fun.core.service.FunctionService;
 import cn.dustlight.fun.kubeless.entities.KubelessFunction;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,7 +43,11 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
 
     @Getter
     @Setter
-    private String hostFormat = "%s.functions.wgv.ink";
+    private String hostFormat = "%s.fun.dustlight.cn";
+
+    @Getter
+    @Setter
+    private String hostTls = "";
 
     @Getter
     @Setter
@@ -116,6 +121,10 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
         spec1.setHostName(String.format(hostFormat, clientId));
         spec1.setGateway(ingressClass);
         spec1.setPath(name);
+        if (StringUtils.hasText(hostTls)) {
+            spec1.setTls(true);
+            spec1.setTlsSecret(hostTls);
+        }
         spec1.setCorsEnable(true);
 
         return Mono.create(sink -> sink.onRequest(unused -> {

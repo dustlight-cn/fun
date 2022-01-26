@@ -5,13 +5,22 @@
 replicaCount: 1
 
 image:
-  repository: dustlightcn/fun-service
-  tag: "latest"
+  repository: "dustlightcn/fun-service"
+  tag: "0.0.3-alpha"
 
 ingress:
   className: "nginx"
   host: "fun.dustlight.cn"
   functionsHost: "%s.fun.dustlight.cn"
+  tls:
+    host:
+      enabled: false
+      crt: ""
+      key: ""
+    functionHost:
+      enabled: false
+      crt: ""
+      key: ""
 
 config:
   auth:

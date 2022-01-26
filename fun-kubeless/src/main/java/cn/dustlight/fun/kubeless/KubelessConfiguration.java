@@ -34,6 +34,7 @@ public class KubelessConfiguration {
 
         service.setHostFormat(properties.getHostFormat());
         service.setIngressClass(properties.getIngressClass());
+        service.setHostTls(properties.getHostTls());
         return service;
     }
 
