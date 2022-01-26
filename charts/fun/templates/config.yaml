@@ -21,6 +21,9 @@ data:
           ingress-class: {{ .Values.ingress.className | quote }}
           functions-namespace: {{ .Release.Namespace | quote }}
           host-format: {{ .Values.ingress.functionsHost | quote }}
+          {{ if .Values.ingress.tls.functionHost.enabled }}
+          host-tls: {{ .Release.Name }}-fun-service-host-tls
+          {{ end }}
       auth:
         oauth2:
           client:

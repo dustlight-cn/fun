@@ -15,6 +15,7 @@ dustlight:
       ingress-class: nginx
       functions-namespace: functions
       host-format: "%s.fun.dustlight.cn"
+      host-tls: ""
   auth:
     oauth2:
       client:
