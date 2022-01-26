@@ -122,7 +122,7 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
         spec1.setGateway(ingressClass);
         spec1.setPath(name);
         if (StringUtils.hasText(hostTls)) {
-            spec1.setTls(true);
+//            spec1.setTls(true);
             spec1.setTlsSecret(hostTls);
         }
         spec1.setCorsEnable(true);
