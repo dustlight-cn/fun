@@ -15,6 +15,14 @@ public interface FunctionService<T extends Function> {
                    String handler,
                    String contentUrl);
 
+    Mono<T> create(String clientId,
+                   String owner,
+                   String name,
+                   String runtime,
+                   String handler,
+                   String contentUrl,
+                   byte[] data);
+
     Mono<T> get(String clientId, String name);
 
     Mono<Void> delete(String clientId, String name);

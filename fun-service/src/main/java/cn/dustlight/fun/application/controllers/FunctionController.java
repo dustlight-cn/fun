@@ -55,7 +55,7 @@ public class FunctionController {
         return AuthPrincipalUtil.obtainClientIdRequireMember(reactiveAuthClient, clientId, principal)
                 .map(this::switchSystemPrefixIfClientIdMatch)
                 .flatMap(cid -> store.store(cid, name, data)
-                        .flatMap(url -> functionService.create(cid, principal.getUidString(), name, runtime, handler, url)));
+                        .flatMap(url -> functionService.create(cid, principal.getUidString(), name, runtime, handler, url, data)));
     }
 
     @Operation(summary = "获取函数")

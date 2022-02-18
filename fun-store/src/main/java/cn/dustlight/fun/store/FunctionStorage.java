@@ -18,14 +18,14 @@ public class FunctionStorage implements FunctionStore {
 
     private RestfulStorage storage;
     private String prefix = "";
-    private long getExpiration = 1000 * 60 * 15;
-    private long storeExpiration = 1000 * 60 * 60 * 24 * 365 * 10L;
+    private long getExpiration = 1000L * 60 * 5;
+    private long storeExpiration = 1000L * 60L * 60L * 24L * 365L * 10L;
 
     @Override
     public Mono<String> store(String clientId, String name, byte[] data) {
         return Mono.just(generateKey(clientId, name))
                 .flatMap(key -> Mono.fromCallable(() -> storage.put(key, new ByteArrayStorableObject(data))))
-                .flatMap(storableObject -> Mono.fromCallable(() -> storage.generateGetUrl(storableObject.getKey(), null)));
+                .flatMap(storableObject -> Mono.fromCallable(() -> storage.generateGetUrl(storableObject.getKey(), storeExpiration)));
     }
 
     @Override

@@ -14,7 +14,7 @@ public class FunctionStorageProperties {
      */
     private String prefix = "";
 
-    private long expiration = 1000 * 60 * 15;
-    private long storeExpiration = 1000 * 60 * 60 * 24 * 365 * 10L;
+    private long expiration = 1000L * 60 * 5;
+    private long storeExpiration = 1000L * 60L * 60L * 24L * 365L * 10L;
 
 }

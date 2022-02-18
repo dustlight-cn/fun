@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: "dustlightcn/fun-service"
-  tag: "0.0.3-alpha"
+  tag: "0.0.3-alpha-1"
 
 ingress:
   className: "nginx"

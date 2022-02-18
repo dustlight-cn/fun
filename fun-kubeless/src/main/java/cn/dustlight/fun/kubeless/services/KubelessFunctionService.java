@@ -16,11 +16,15 @@ import okhttp3.Call;
 import cn.dustlight.fun.core.exceptions.ErrorEnum;
 import cn.dustlight.fun.core.service.FunctionService;
 import cn.dustlight.fun.kubeless.entities.KubelessFunction;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class KubelessFunctionService implements FunctionService<KubelessFunction> {
 
@@ -53,6 +57,8 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
     @Setter
     private String ingressClass = "nginx";
 
+    private RuntimeImages runtimeImages;
+
     protected CoreV1Api coreV1Api = new CoreV1Api();
     protected CustomObjectsApi customObjectsApi = new CustomObjectsApi();
 
@@ -75,132 +81,15 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
                                          String runtime,
                                          String handler,
                                          String contentUrl) {
+        return createFunction(clientId, owner, name, runtime, handler, contentUrl, "");
+    }
 
-        FunctionEntity entity = new FunctionEntity();
-        FunctionEntity.Spec spec = new FunctionEntity.Spec();
-        V1ObjectMeta meta = new V1ObjectMeta();
-        entity.setMetadata(meta);
-        entity.setSpec(spec);
-        entity.setKind("Function");
-        entity.setApiVersion("kubeless.io/v1beta1");
-
-        meta.setNamespace(namespace);
-        meta.setName(String.format("c%s-%s", clientId, name));
-        meta.putLabelsItem("clientId", clientId);
-        meta.putLabelsItem("owner", owner);
-        meta.putLabelsItem("name", name);
-
-        spec.setFunction(contentUrl);
-        spec.setRuntime(runtime);
-        spec.setFunctionContentType("url+zip");
-        spec.setHandler(handler);
-
-        V1Deployment deployment = new V1Deployment();
-        spec.setDeployment(deployment);
-
-        V1ServiceSpec service = new V1ServiceSpec();
-        spec.setService(service);
-        service.putSelectorItem("function", meta.getName());
-        service.addPortsItem(v1ServicePort);
-
-        HttpTriggerEntity httpTrigger = new HttpTriggerEntity();
-        V1ObjectMeta meta1 = new V1ObjectMeta();
-        HttpTriggerEntity.Spec spec1 = new HttpTriggerEntity.Spec();
-        httpTrigger.setMetadata(meta1);
-        httpTrigger.setSpec(spec1);
-        httpTrigger.setKind("HTTPTrigger");
-        httpTrigger.setApiVersion("kubeless.io/v1beta1");
-
-        meta1.setNamespace(namespace);
-        meta1.setName(String.format("c%s-%s", clientId, name));
-        meta1.putLabelsItem("clientId", clientId);
-        meta1.putLabelsItem("owner", owner);
-        meta1.putLabelsItem("name", name);
-
-        spec1.setFunctionName(meta.getName());
-        spec1.setHostName(String.format(hostFormat, clientId));
-        spec1.setGateway(ingressClass);
-        spec1.setPath(name);
-        if (StringUtils.hasText(hostTls)) {
-//            spec1.setTls(true);
-            spec1.setTlsSecret(hostTls);
-        }
-        spec1.setCorsEnable(true);
-
-        return Mono.create(sink -> sink.onRequest(unused -> {
-            try {
-                Call call = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
-                        "v1beta1",
-                        namespace,
-                        "functions",
-                        entity,
-                        null,
-                        null,
-                        null,
-                        null);
-                this.client.executeAsync(call, FunctionEntity.class, new ApiCallback<FunctionEntity>() {
-                    @Override
-                    public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                        if (statusCode == 409)
-                            sink.error(ErrorEnum.FUNCTION_EXISTS.getException());
-                        else
-                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
-                    }
-
-                    @Override
-                    public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
-                        try {
-                            Thread.sleep(1000);
-
-                            Call c = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
-                                    "v1beta1",
-                                    namespace,
-                                    "httptriggers",
-                                    httpTrigger,
-                                    null,
-                                    null,
-                                    null,
-                                    null);
-                            client.executeAsync(c, new ApiCallback<Object>() {
-                                @Override
-                                public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                    sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
-                                }
-
-                                @Override
-                                public void onSuccess(Object resultx, int statusCode, Map<String, List<String>> responseHeaders) {
-                                    sink.success(new KubelessFunction(result));
-                                }
-
-                                @Override
-                                public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-
-                                }
-
-                                @Override
-                                public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-
-                                }
-                            });
-                        } catch (ApiException | InterruptedException e) {
-                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
-                        }
-                    }
-
-                    @Override
-                    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-
-                    }
-
-                    @Override
-                    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-
-                    }
-                });
-            } catch (Exception e) {
-                sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
-            }
-        }));
+    @Override
+    public Mono<KubelessFunction> create(String clientId, String owner, String name, String runtime, String handler, String contentUrl, byte[] data) {
+        return getRuntimeImages()
+                .map(runtimeImages1 -> this.getDepFilename(runtime, runtimeImages1))
+                .map(depFilename -> this.readZipText(data, depFilename))
+                .flatMap(depFile -> createFunction(clientId, owner, name, runtime, handler, contentUrl, depFile));
     }
 
     @Override
@@ -375,48 +264,222 @@ public class KubelessFunctionService implements FunctionService<KubelessFunction
 
     @Override
     public Mono<Collection<String>> getRuntimes() {
-        return Mono.create(sink -> sink.onRequest(unused ->
-                {
-                    try {
-                        coreV1Api.readNamespacedConfigMapAsync(kubelessConfigName,
-                                kubelessNamespace,
-                                "",
-                                false,
-                                false,
-                                new ApiCallback<V1ConfigMap>() {
-                                    @Override
-                                    public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
-                                        sink.error(e);
-                                    }
-
-                                    @Override
-                                    public void onSuccess(V1ConfigMap configMap, int i, Map<String, List<String>> map) {
-                                        sink.success(configMap);
-                                    }
-
-                                    @Override
-                                    public void onUploadProgress(long l, long l1, boolean b) {
-
-                                    }
-
-                                    @Override
-                                    public void onDownloadProgress(long l, long l1, boolean b) {
-
-                                    }
-                                });
-                    } catch (Throwable e) {
-                        sink.error(e);
-                    }
-                }))
-                .cast(V1ConfigMap.class)
-                .map(v1ConfigMap -> v1ConfigMap.getData().get(RUNTIME_IMAGES_KEY))
+        return getRuntimeImages()
                 .map(this::listRuntimes);
     }
 
     @SneakyThrows
-    protected Collection<String> listRuntimes(String json) {
+    protected String readZipText(byte[] data, String filename) {
+        if (data == null || !StringUtils.hasText(filename))
+            return "";
+        try (ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(data))) {
+            ZipEntry entry;
+
+            while ((entry = zipIn.getNextEntry()) != null) {
+                if (!entry.isDirectory() && entry.getName().equals(filename)) {
+                    byte[] bytes = IOUtils.toByteArray(zipIn);
+                    zipIn.closeEntry();
+                    return new String(bytes);
+                }
+            }
+        }
+        return "";
+    }
+
+    protected Mono<KubelessFunction> createFunction(String clientId,
+                                                    String owner,
+                                                    String name,
+                                                    String runtime,
+                                                    String handler,
+                                                    String contentUrl,
+                                                    String deps) {
+
+        FunctionEntity entity = new FunctionEntity();
+        FunctionEntity.Spec spec = new FunctionEntity.Spec();
+        V1ObjectMeta meta = new V1ObjectMeta();
+        entity.setMetadata(meta);
+        entity.setSpec(spec);
+        entity.setKind("Function");
+        entity.setApiVersion("kubeless.io/v1beta1");
+
+        meta.setNamespace(namespace);
+        meta.setName(String.format("c%s-%s", clientId, name));
+        meta.putLabelsItem("clientId", clientId);
+        meta.putLabelsItem("owner", owner);
+        meta.putLabelsItem("name", name);
+
+        spec.setFunction(contentUrl);
+        spec.setRuntime(runtime);
+        spec.setFunctionContentType("url+zip");
+        spec.setHandler(handler);
+        spec.setDependencies(deps);
+
+        V1Deployment deployment = new V1Deployment();
+        spec.setDeployment(deployment);
+
+        V1ServiceSpec service = new V1ServiceSpec();
+        spec.setService(service);
+        service.putSelectorItem("function", meta.getName());
+        service.addPortsItem(v1ServicePort);
+
+        HttpTriggerEntity httpTrigger = new HttpTriggerEntity();
+        V1ObjectMeta meta1 = new V1ObjectMeta();
+        HttpTriggerEntity.Spec spec1 = new HttpTriggerEntity.Spec();
+        httpTrigger.setMetadata(meta1);
+        httpTrigger.setSpec(spec1);
+        httpTrigger.setKind("HTTPTrigger");
+        httpTrigger.setApiVersion("kubeless.io/v1beta1");
+
+        meta1.setNamespace(namespace);
+        meta1.setName(String.format("c%s-%s", clientId, name));
+        meta1.putLabelsItem("clientId", clientId);
+        meta1.putLabelsItem("owner", owner);
+        meta1.putLabelsItem("name", name);
+
+        spec1.setFunctionName(meta.getName());
+        spec1.setHostName(String.format(hostFormat, clientId));
+        spec1.setGateway(ingressClass);
+        spec1.setPath(name);
+        if (StringUtils.hasText(hostTls)) {
+//            spec1.setTls(true);
+            spec1.setTlsSecret(hostTls);
+        }
+        spec1.setCorsEnable(true);
+
+        return Mono.create(sink -> sink.onRequest(unused -> {
+            try {
+                Call call = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
+                        "v1beta1",
+                        namespace,
+                        "functions",
+                        entity,
+                        null,
+                        null,
+                        null,
+                        null);
+                this.client.executeAsync(call, FunctionEntity.class, new ApiCallback<FunctionEntity>() {
+                    @Override
+                    public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                        if (statusCode == 409)
+                            sink.error(ErrorEnum.FUNCTION_EXISTS.getException());
+                        else
+                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+                    }
+
+                    @Override
+                    public void onSuccess(FunctionEntity result, int statusCode, Map<String, List<String>> responseHeaders) {
+                        try {
+                            Thread.sleep(1000);
+
+                            Call c = customObjectsApi.createNamespacedCustomObjectCall("kubeless.io",
+                                    "v1beta1",
+                                    namespace,
+                                    "httptriggers",
+                                    httpTrigger,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
+                            client.executeAsync(c, new ApiCallback<Object>() {
+                                @Override
+                                public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+                                }
+
+                                @Override
+                                public void onSuccess(Object resultx, int statusCode, Map<String, List<String>> responseHeaders) {
+                                    sink.success(new KubelessFunction(result));
+                                }
+
+                                @Override
+                                public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                                }
+
+                                @Override
+                                public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                                }
+                            });
+                        } catch (ApiException | InterruptedException e) {
+                            sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+                        }
+                    }
+
+                    @Override
+                    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+
+                    }
+
+                    @Override
+                    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+
+                    }
+                });
+            } catch (Exception e) {
+                sink.error(ErrorEnum.CREATE_FUNCTION_FAILED.details(e).getException());
+            }
+        }));
+    }
+
+    protected Mono<RuntimeImages> getRuntimeImages() {
+        return Mono.justOrEmpty(runtimeImages)
+                .switchIfEmpty(Mono.create(sink -> sink.onRequest(unused ->
+                        {
+                            try {
+                                coreV1Api.readNamespacedConfigMapAsync(kubelessConfigName,
+                                        kubelessNamespace,
+                                        "",
+                                        false,
+                                        false,
+                                        new ApiCallback<>() {
+                                            @Override
+                                            public void onFailure(ApiException e, int i, Map<String, List<String>> map) {
+                                                sink.error(e);
+                                            }
+
+                                            @Override
+                                            public void onSuccess(V1ConfigMap configMap, int i, Map<String, List<String>> map) {
+                                                sink.success(configMap);
+                                            }
+
+                                            @Override
+                                            public void onUploadProgress(long l, long l1, boolean b) {
+
+                                            }
+
+                                            @Override
+                                            public void onDownloadProgress(long l, long l1, boolean b) {
+
+                                            }
+                                        });
+                            } catch (Throwable e) {
+                                sink.error(e);
+                            }
+                        }))
+                        .cast(V1ConfigMap.class)
+                        .map(v1ConfigMap -> v1ConfigMap.getData().get(RUNTIME_IMAGES_KEY))
+                        .map(this::convertRuntimeImages)
+                        .map(runtimeImages1 -> this.runtimeImages = runtimeImages1));
+    }
+
+    protected String getDepFilename(String runtime, RuntimeImages runtimeImages) {
+        for (RuntimeImage image : runtimeImages) {
+            if (runtime.startsWith(image.getId())) {
+                return image.getDepName();
+            }
+        }
+        return "";
+    }
+
+    @SneakyThrows
+    protected RuntimeImages convertRuntimeImages(String json) {
+        return mapper.readValue(json, RuntimeImages.class);
+    }
+
+    @SneakyThrows
+    protected Collection<String> listRuntimes(RuntimeImages images) {
         HashSet<String> runtimes = new HashSet<>();
-        RuntimeImages images = mapper.readValue(json, RuntimeImages.class);
         for (RuntimeImage image : images) {
             if (image.getVersions() == null || image.getVersions().size() == 0)
                 continue;
