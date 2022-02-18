@@ -17,6 +17,7 @@ public class FunctionStorageConfiguration {
         functionStorage.setStorage(storage);
         functionStorage.setPrefix(properties.getPrefix());
         functionStorage.setGetExpiration(properties.getExpiration());
+        functionStorage.setStoreExpiration(properties.getStoreExpiration());
         return functionStorage;
     }
 

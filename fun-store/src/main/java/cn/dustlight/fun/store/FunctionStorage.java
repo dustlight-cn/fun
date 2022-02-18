@@ -19,6 +19,7 @@ public class FunctionStorage implements FunctionStore {
     private RestfulStorage storage;
     private String prefix = "";
     private long getExpiration = 1000 * 60 * 15;
+    private long storeExpiration = 1000 * 60 * 60 * 24 * 365 * 10L;
 
     @Override
     public Mono<String> store(String clientId, String name, byte[] data) {
